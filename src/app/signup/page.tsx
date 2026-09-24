@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import signupImg from "@/assests/signup.png";
+import business2Img from "@/assests/business2.jpg";
 import RegistrationForm from "./RegistrationForm";
 import RightUpLogo from "@/components/RightUpLogo";
 
@@ -12,10 +12,10 @@ export default function SignupPage() {
       <div className="hidden xl:flex lg:w-[700px] relative">
         <div className="absolute inset-0 right-8">
           <Image
-            src={signupImg}
+            src={business2Img}
             alt="Business professionals networking"
             fill
-            className="object-fill"
+            className="object-cover"
             priority
           />
           <div className="absolute inset-0 bg-black/20" />

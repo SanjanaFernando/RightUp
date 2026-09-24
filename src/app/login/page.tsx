@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import signupImg from "@/assests/signup.png";
+import business1Img from "@/assests/business1.jpg";
 import RightUpLogo from "@/components/RightUpLogo";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { loginUserAction } from "@/actions/auth";
@@ -61,7 +61,7 @@ export default function LoginPage() {
           {/* Image Container */}
           <div className="absolute top-2 left-0 right-2 bottom-0 rounded-tr-[76px] overflow-hidden bg-black">
             <Image
-              src={signupImg}
+              src={business1Img}
               alt="Login"
               fill
               className="object-cover opacity-90"
