@@ -45,10 +45,9 @@ export default function SignupPage() {
           </div>
 
           {/* ── Google Sign-In ───────────────────────────────────────────── */}
-          <div className="mb-6">
+          <div className="mb-6 flex items-center justify-center">
             <GoogleSignInButton label="Continue with Google" />
           </div>
-
           {/* Divider */}
           <div className="flex items-center gap-4 mb-8">
             <div className="flex-1 h-px bg-white/10" />

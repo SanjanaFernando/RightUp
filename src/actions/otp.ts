@@ -35,12 +35,21 @@ export async function sendOtpAction(email: string): Promise<ActionResponse> {
   }
 
   try {
-    await connectToDatabase();
+    const normalizedEmail = email.toLowerCase().trim();
 
     // Check if email is already registered
-    const existing = await User.findOne({ email: email.toLowerCase().trim() });
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       return { success: false, error: "An account with this email already exists." };
+    }
+
+    // Deduplication check: If an unexpired OTP was dispatched in the last 30 seconds, reuse it and don't double-send
+    const existingOtp = await Otp.findOne({ email: normalizedEmail });
+    if (existingOtp && existingOtp.updatedAt) {
+      const timeSinceLastSend = Date.now() - new Date(existingOtp.updatedAt).getTime();
+      if (timeSinceLastSend < 30 * 1000 && !existingOtp.verified && existingOtp.expiresAt > new Date()) {
+        return { success: true, message: "Verification code sent! Please check your inbox." };
+      }
     }
 
     const code = generateOtp();
@@ -48,7 +57,7 @@ export async function sendOtpAction(email: string): Promise<ActionResponse> {
 
     // Upsert: replace any existing OTP for this email
     await Otp.findOneAndUpdate(
-      { email: email.toLowerCase() },
+      { email: normalizedEmail },
       { code, expiresAt, verified: false },
       { upsert: true, new: true }
     );

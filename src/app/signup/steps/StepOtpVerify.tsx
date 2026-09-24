@@ -20,10 +20,14 @@ export default function StepOtpVerify({ data, updateData, onNext, onBack }: Step
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const hasSentRef = useRef(false);
 
-  // Auto-send OTP as soon as this step mounts
+  // Auto-send OTP exactly once when this step mounts
   useEffect(() => {
-    handleSend();
+    if (!hasSentRef.current && data.email) {
+      hasSentRef.current = true;
+      handleSend();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -35,16 +39,22 @@ export default function StepOtpVerify({ data, updateData, onNext, onBack }: Step
   }, [countdown]);
 
   const handleSend = async () => {
+    if (isSending) return;
     setIsSending(true);
     setError(null);
-    const res = await sendOtpAction(data.email);
-    setIsSending(false);
-    if (res.success) {
-      setSent(true);
-      setCountdown(60); // 60s before resend allowed
-      setTimeout(() => inputRefs.current[0]?.focus(), 100);
-    } else {
-      setError(res.error || "Failed to send code.");
+    try {
+      const res = await sendOtpAction(data.email);
+      if (res.success) {
+        setSent(true);
+        setCountdown(60); // 60s before resend allowed
+        setTimeout(() => inputRefs.current[0]?.focus(), 100);
+      } else {
+        setError(res.error || "Failed to send code.");
+      }
+    } catch {
+      setError("Failed to send code. Please try again.");
+    } finally {
+      setIsSending(false);
     }
   };
 

@@ -17,8 +17,7 @@ interface GoogleSignInButtonProps {
 
 /**
  * Renders the official Google Identity Services "Sign in with Google" button.
- * On success, calls the server to verify the token, sets the Zustand auth store,
- * and redirects to the home page.
+ * Horizontally and vertically centered.
  */
 export default function GoogleSignInButton({
   onSuccess,
@@ -51,6 +50,9 @@ export default function GoogleSignInButton({
     const initGoogle = () => {
       if (!containerRef.current || !window.google?.accounts) return;
 
+      // Clear any previous button instance to prevent duplicate rendering
+      containerRef.current.innerHTML = "";
+
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleCredential,
@@ -62,7 +64,6 @@ export default function GoogleSignInButton({
         theme: "filled_black",
         size: "large",
         shape: "pill",
-        width: containerRef.current.offsetWidth || 400,
         text: "continue_with",
       });
     };
@@ -103,9 +104,9 @@ export default function GoogleSignInButton({
   }
 
   return (
-    <div className="w-full">
-      {/* Google renders its own button into this div */}
-      <div ref={containerRef} className="w-full" />
+    <div className="w-full flex flex-col items-center justify-center">
+      {/* Google renders its own button into this centered container */}
+      <div ref={containerRef} className="flex items-center justify-center min-h-[44px]" />
 
       {loading && (
         <p className="text-center text-sm text-gray-400 mt-3 animate-pulse">
