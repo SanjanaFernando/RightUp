@@ -1,5 +1,6 @@
 import React from "react";
 import FormInput from "../components/FormInput";
+import CustomSelect from "../components/CustomSelect";
 
 interface StepProps {
   data: any;
@@ -25,30 +26,20 @@ export default function Step7Location({ data, updateData, onNext, onBack }: Step
       </div>
 
       <div className="flex flex-col gap-6 mb-10 flex-1">
-        <div>
-          <label className="block text-[15px] text-gray-200 mb-2.5">
-            Country <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={data.country || ""}
-              onChange={(e) => updateData({ country: e.target.value })}
-              className="w-full bg-[#0F1627] border border-white/10 rounded-xl px-4 py-3.5 text-white appearance-none focus:outline-none focus:border-[#00DC82] focus:ring-1 focus:ring-[#00DC82]/50 transition-all duration-300"
-            >
-              <option value="" disabled>Select country</option>
-              <option value="Australia">Australia</option>
-              <option value="United States">United States</option>
-              <option value="United Kingdom">United Kingdom</option>
-              <option value="Canada">Canada</option>
-              <option value="Other">Other</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-        </div>
+        <CustomSelect
+          label="Country"
+          placeholder="Select country"
+          value={data.country || ""}
+          options={[
+            "Australia",
+            "United States",
+            "United Kingdom",
+            "Canada",
+            "Other",
+          ]}
+          onChange={(val) => updateData({ country: val })}
+          required
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <FormInput

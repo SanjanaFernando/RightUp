@@ -25,6 +25,7 @@ export default function RegistrationForm() {
     firstName: "",
     lastName: "",
     title: "",
+    avatar: "",
     email: "",
     phone: "",
     companyName: "",

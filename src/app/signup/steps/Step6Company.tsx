@@ -1,5 +1,6 @@
 import React from "react";
 import FormInput from "../components/FormInput";
+import CustomSelect from "../components/CustomSelect";
 
 interface StepProps {
   data: any;
@@ -33,31 +34,21 @@ export default function Step6Company({ data, updateData, onNext, onBack }: StepP
           required
         />
         
-        <div>
-          <label className="block text-[15px] text-gray-200 mb-2.5">
-            Industry <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={data.industry || ""}
-              onChange={(e) => updateData({ industry: e.target.value })}
-              className="w-full bg-[#0F1627] border border-white/10 rounded-xl px-4 py-3.5 text-white appearance-none focus:outline-none focus:border-[#00DC82] focus:ring-1 focus:ring-[#00DC82]/50 transition-all duration-300"
-            >
-              <option value="" disabled>Select industry</option>
-              <option value="Technology">Technology</option>
-              <option value="Finance">Finance</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Real Estate">Real Estate</option>
-              <option value="Consulting">Consulting</option>
-              <option value="Other">Other</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-        </div>
+        <CustomSelect
+          label="Industry"
+          placeholder="Select industry"
+          value={data.industry || ""}
+          options={[
+            "Technology",
+            "Finance",
+            "Healthcare",
+            "Real Estate",
+            "Consulting",
+            "Other",
+          ]}
+          onChange={(val) => updateData({ industry: val })}
+          required
+        />
 
         <FormInput
           label="Website URL"

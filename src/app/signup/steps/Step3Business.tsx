@@ -1,5 +1,6 @@
 import React from "react";
 import FormInput from "../components/FormInput";
+import CustomSelect from "../components/CustomSelect";
 
 interface StepProps {
   data: any;
@@ -17,33 +18,23 @@ export default function Step3Business({ data, updateData, onNext, onBack }: Step
 
   return (
     <div className="flex flex-col h-full animate-[slideUpFade_0.4s_ease-out_forwards]">
-      
+
       <div className="flex flex-col gap-8 mb-10 flex-1">
         {/* Stage Dropdown */}
-        <div>
-          <label className="block text-[15px] text-gray-200 mb-2.5">
-            4. Select what best describes your current business or professional stage <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={data.stage || ""}
-              onChange={(e) => updateData({ stage: e.target.value })}
-              className="w-full bg-[#0F1627] border border-white/10 rounded-xl px-4 py-3.5 text-white appearance-none focus:outline-none focus:border-[#00DC82] focus:ring-1 focus:ring-[#00DC82]/50 transition-all duration-300"
-            >
-              <option value="" disabled>Select stage</option>
-              <option value="Idea / Pre-seed">Idea / Pre-seed</option>
-              <option value="Startup / Seed">Startup / Seed</option>
-              <option value="Growth / Series A+">Growth / Series A+</option>
-              <option value="Established Enterprise">Established Enterprise</option>
-              <option value="Independent Professional">Independent Professional</option>
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </div>
-        </div>
+        <CustomSelect
+          label="4. Select what best describes your current business or professional stage"
+          placeholder="Select stage"
+          value={data.stage || ""}
+          options={[
+            "Idea / Pre-seed",
+            "Startup / Seed",
+            "Growth / Series A+",
+            "Established Enterprise",
+            "Independent Professional",
+          ]}
+          onChange={(val) => updateData({ stage: val })}
+          required
+        />
 
         {/* Strengths */}
         <div>

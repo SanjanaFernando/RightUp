@@ -11,6 +11,7 @@ export interface RegisterInput {
   lastName: string;
   title?: string;
   phone?: string;
+  avatar?: string;
   intent?: string;
   goals?: string[];
   stage?: string;
@@ -200,6 +201,7 @@ export async function getCurrentUserAction(): Promise<ActionResponse> {
         firstName: user.firstName,
         lastName: user.lastName,
         title: user.title,
+        avatarUrl: user.avatar,
         companyName: user.companyName,
         role: user.role,
       },

@@ -10,6 +10,7 @@ export interface IUser extends Document {
   lastName: string;
   title?: string;
   phone?: string;
+  avatar?: string;
 
   // Onboarding / Intent
   intent?: string;
@@ -70,6 +71,10 @@ const UserSchema: Schema<IUser> = new Schema(
       trim: true,
     },
     phone: {
+      type: String,
+      trim: true,
+    },
+    avatar: {
       type: String,
       trim: true,
     },
