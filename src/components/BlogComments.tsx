@@ -157,9 +157,9 @@ export default function BlogComments({ blogSlug }: BlogCommentsProps) {
       blogSlug,
       userName: name,
       userEmail: currentUser?.email || authorEmail,
-      userAvatar: currentUser?.avatar || "",
+      userAvatar: currentUser?.avatarUrl || "",
       userTitle: currentUser?.title || authorTitle || "Industry Professional",
-      userId: currentUser?._id,
+      userId: currentUser?.userId,
       content: commentText.trim(),
     });
 
@@ -184,9 +184,9 @@ export default function BlogComments({ blogSlug }: BlogCommentsProps) {
       blogSlug,
       userName: name,
       userEmail: currentUser?.email || authorEmail,
-      userAvatar: currentUser?.avatar || "",
+      userAvatar: currentUser?.avatarUrl || "",
       userTitle: currentUser?.title || authorTitle || "Industry Professional",
-      userId: currentUser?._id,
+      userId: currentUser?.userId,
       content: replyText.trim(),
       parentId,
     });

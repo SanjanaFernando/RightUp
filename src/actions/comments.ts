@@ -329,7 +329,7 @@ export async function addCommentAction(data: {
       userTitle: data.userTitle || "Verified Member",
       userId: data.userId,
       content: data.content.trim(),
-      parentId: data.parentId || null,
+      parentId: data.parentId || undefined,
       likes: 0,
       likedBy: [],
     });
@@ -379,13 +379,13 @@ export async function toggleLikeCommentAction(
       return { success: false, error: "Comment not found", likes: 0, liked: false };
     }
 
-    const alreadyLiked = comment.likedBy?.includes(userIdentifier);
+    const likedByList: string[] = comment.likedBy || [];
+    const alreadyLiked = likedByList.includes(userIdentifier);
     if (alreadyLiked) {
-      comment.likedBy = comment.likedBy.filter((id: string) => id !== userIdentifier);
+      comment.likedBy = likedByList.filter((id: string) => id !== userIdentifier);
       comment.likes = Math.max(0, (comment.likes || 1) - 1);
     } else {
-      if (!comment.likedBy) comment.likedBy = [];
-      comment.likedBy.push(userIdentifier);
+      comment.likedBy = [...likedByList, userIdentifier];
       comment.likes = (comment.likes || 0) + 1;
     }
 

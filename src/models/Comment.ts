@@ -10,7 +10,7 @@ export interface IComment extends Document {
   content: string;
   likes: number;
   likedBy?: string[];
-  parentId?: string;
+  parentId?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
