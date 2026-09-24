@@ -6,6 +6,7 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import RightUpLogo from "./RightUpLogo";
 import SignupModal from "./SignupModal";
 import UserDropdown from "./UserDropdown";
+import ProfileModal from "./ProfileModal";
 import { getCurrentUserAction, logoutUserAction } from "@/actions/auth";
 
 export default function Navbar() {
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [signupModalOpen, setSignupModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
 
@@ -134,6 +136,7 @@ export default function Navbar() {
           {currentUser ? (
             <UserDropdown
               user={currentUser}
+              onOpenProfile={() => setProfileModalOpen(true)}
               onSignOut={() => {
                 setCurrentUser(null);
                 window.location.reload();
@@ -202,10 +205,20 @@ export default function Navbar() {
           <div className="pt-2">
             {currentUser ? (
               <div className="flex flex-col gap-2 p-3 bg-white/5 rounded-2xl">
-                <div className="flex items-center gap-3">
+                <div
+                  className="flex items-center gap-3 cursor-pointer"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setProfileModalOpen(true);
+                  }}
+                >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#00DC82] to-[#1D4ED8] p-[1.5px]">
-                    <div className="w-full h-full rounded-full bg-[#0E131F] flex items-center justify-center font-bold text-white text-xs">
-                      {`${(currentUser.firstName || "U")[0]}${(currentUser.lastName || "")[0] || ""}`.toUpperCase()}
+                    <div className="w-full h-full rounded-full bg-[#0E131F] flex items-center justify-center font-bold text-white text-xs overflow-hidden">
+                      {currentUser.avatarUrl ? (
+                        <img src={currentUser.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        `${(currentUser.firstName || "U")[0]}${(currentUser.lastName || "")[0] || ""}`.toUpperCase()
+                      )}
                     </div>
                   </div>
                   <div>
@@ -213,17 +226,28 @@ export default function Navbar() {
                     <div className="text-gray-400 text-xs">{currentUser.email}</div>
                   </div>
                 </div>
-                <button
-                  onClick={async () => {
-                    setMobileMenuOpen(false);
-                    await logoutUserAction();
-                    setCurrentUser(null);
-                    window.location.reload();
-                  }}
-                  className="mt-2 w-full text-center px-4 py-2 rounded-xl text-sm font-medium text-white bg-red-600/80 hover:bg-red-600 transition-colors"
-                >
-                  Sign Out
-                </button>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setProfileModalOpen(true);
+                    }}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await logoutUserAction();
+                      setCurrentUser(null);
+                      window.location.reload();
+                    }}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold text-white bg-red-600/80 hover:bg-red-600 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
               </div>
             ) : (
               <button
@@ -239,11 +263,22 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
       {/* Signup Modal */}
       <SignupModal 
         isOpen={signupModalOpen} 
         onClose={() => setSignupModalOpen(false)} 
       />
+
+      {/* Profile Modal */}
+      {currentUser && (
+        <ProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          user={currentUser}
+          onProfileUpdated={(updated) => setCurrentUser(updated)}
+        />
+      )}
     </header>
   );
 }

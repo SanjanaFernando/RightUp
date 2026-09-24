@@ -201,12 +201,81 @@ export async function getCurrentUserAction(): Promise<ActionResponse> {
         firstName: user.firstName,
         lastName: user.lastName,
         title: user.title,
+        phone: user.phone,
         avatarUrl: user.avatar,
+        intent: user.intent,
+        goals: user.goals,
+        stage: user.stage,
+        strengths: user.strengths,
+        challenges: user.challenges,
         companyName: user.companyName,
+        industry: user.industry,
+        companySize: user.companySize,
+        website: user.website,
+        country: user.country,
+        state: user.state,
+        city: user.city,
+        linkedin: user.linkedin,
+        twitter: user.twitter,
         role: user.role,
+        createdAt: user.createdAt,
       },
     };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to fetch user session." };
+  }
+}
+
+/**
+ * Update user profile
+ */
+export async function updateProfileAction(updatedData: Partial<RegisterInput>): Promise<ActionResponse> {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    await connectToDatabase();
+    const user = await User.findById(session.userId);
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+
+    // Update allowed fields
+    if (updatedData.firstName !== undefined) user.firstName = updatedData.firstName;
+    if (updatedData.lastName !== undefined) user.lastName = updatedData.lastName;
+    if (updatedData.title !== undefined) user.title = updatedData.title;
+    if (updatedData.phone !== undefined) user.phone = updatedData.phone;
+    if (updatedData.avatar !== undefined) user.avatar = updatedData.avatar;
+    if (updatedData.companyName !== undefined) user.companyName = updatedData.companyName;
+    if (updatedData.industry !== undefined) user.industry = updatedData.industry;
+    if (updatedData.website !== undefined) user.website = updatedData.website;
+    if (updatedData.country !== undefined) user.country = updatedData.country;
+    if (updatedData.state !== undefined) user.state = updatedData.state;
+    if (updatedData.city !== undefined) user.city = updatedData.city;
+    if (updatedData.linkedin !== undefined) user.linkedin = updatedData.linkedin;
+    if (updatedData.twitter !== undefined) user.twitter = updatedData.twitter;
+    if (updatedData.stage !== undefined) user.stage = updatedData.stage;
+    if (updatedData.strengths !== undefined) user.strengths = updatedData.strengths;
+    if (updatedData.challenges !== undefined) user.challenges = updatedData.challenges;
+
+    await user.save();
+
+    return {
+      success: true,
+      message: "Profile updated successfully!",
+      data: {
+        userId: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        title: user.title,
+        avatarUrl: user.avatar,
+      },
+    };
+  } catch (error: any) {
+    console.error("Update profile error:", error);
+    return { success: false, error: error.message || "Failed to update profile." };
   }
 }

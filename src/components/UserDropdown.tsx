@@ -13,9 +13,10 @@ export interface UserMenuProps {
     avatarUrl?: string;
   };
   onSignOut?: () => void;
+  onOpenProfile?: () => void;
 }
 
-export default function UserDropdown({ user, onSignOut }: UserMenuProps) {
+export default function UserDropdown({ user, onSignOut, onOpenProfile }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +42,11 @@ export default function UserDropdown({ user, onSignOut }: UserMenuProps) {
     } else {
       window.location.href = "/";
     }
+  };
+
+  const handleOpenProfile = () => {
+    setIsOpen(false);
+    onOpenProfile?.();
   };
 
   return (
@@ -93,14 +99,14 @@ export default function UserDropdown({ user, onSignOut }: UserMenuProps) {
 
           {/* Group 1: Profile & Settings */}
           <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-1.5 mb-2.5 space-y-0.5">
-            <Link
-              href="#profile"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 text-[14px] transition-colors"
+            <button
+              type="button"
+              onClick={handleOpenProfile}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 text-[14px] transition-colors text-left"
             >
               <User className="w-4 h-4 text-gray-400" />
               <span>User Profile</span>
-            </Link>
+            </button>
             <Link
               href="#settings"
               onClick={() => setIsOpen(false)}

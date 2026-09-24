@@ -21,8 +21,8 @@ export default function Step4Personal({ data, updateData, onNext, onBack }: Step
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Image size should be less than 2MB");
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size should be less than 5MB");
         return;
       }
       const reader = new FileReader();
@@ -73,7 +73,7 @@ export default function Step4Personal({ data, updateData, onNext, onBack }: Step
 
           <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-2 flex-1">
             <h3 className="text-white text-sm font-medium">Profile Picture (Optional)</h3>
-            <p className="text-gray-400 text-xs">Upload a clear photo. Supports JPG, PNG or WebP up to 2MB.</p>
+            <p className="text-gray-400 text-xs">Upload a clear photo. Supports JPG, PNG or WebP up to 5MB.</p>
             
             <input
               type="file"
