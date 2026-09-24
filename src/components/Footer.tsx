@@ -66,32 +66,32 @@ export default function Footer() {
             <h3 className="text-base font-bold text-white mb-5 tracking-wide">Company</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="#about" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/#about" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> About Us
                 </Link>
               </li>
               <li>
-                <Link href="#memberships" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/#memberships" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> Membership
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/#services" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> Services
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/#contact" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> Contact Us
                 </Link>
               </li>
               <li>
-                <Link href="#signup" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/signup" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> Register
                 </Link>
               </li>
               <li>
-                <Link href="#login" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/login" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> Login
                 </Link>
               </li>
@@ -103,12 +103,12 @@ export default function Footer() {
             <h3 className="text-base font-bold text-white mb-5 tracking-wide">Useful Links</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="#blogs" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
-                  <span className="text-green-500 text-xs">›</span> Blogs & News
+                <Link href="/blogs" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                  <span className="text-green-500 text-xs">›</span> Blogs & Insights
                 </Link>
               </li>
               <li>
-                <Link href="#services" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
+                <Link href="/#services" className="hover:text-green-500 transition-colors flex items-center gap-1.5">
                   <span className="text-green-500 text-xs">›</span> E Magazines
                 </Link>
               </li>

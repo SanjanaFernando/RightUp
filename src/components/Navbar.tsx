@@ -112,13 +112,13 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-9">
           <Link
-            href="#about"
+            href="/#about"
             className="text-[20px] font-normal text-gray-200 hover:text-white transition-colors duration-200"
           >
             About
           </Link>
           <Link
-            href="#memberships"
+            href="/#memberships"
             className="text-[20px] font-normal text-gray-200 hover:text-white transition-colors duration-200"
           >
             Membership
@@ -139,21 +139,21 @@ export default function Navbar() {
                 className="absolute top-full left-0 mt-2 w-52 rounded-xl bg-[#0F172A] border border-white/10 shadow-2xl py-2 z-50 backdrop-blur-xl animate-[slideUpFade_0.2s_ease-out]"
               >
                 <Link
-                  href="#blogs"
+                  href="/blogs"
                   onClick={() => setResourcesOpen(false)}
                   className="block px-4 py-2.5 text-base font-normal text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
                 >
-                  Blogs & News
+                  Blogs & Insights
                 </Link>
                 <Link
-                  href="#services"
+                  href="/#services"
                   onClick={() => setResourcesOpen(false)}
                   className="block px-4 py-2.5 text-base font-normal text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
                 >
                   E-Magazines
                 </Link>
                 <Link
-                  href="#why-choose-us"
+                  href="/#why-choose-us"
                   onClick={() => setResourcesOpen(false)}
                   className="block px-4 py-2.5 text-base font-normal text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
                 >
@@ -164,13 +164,13 @@ export default function Navbar() {
           </div>
 
           <Link
-            href="#services"
+            href="/#services"
             className="text-[20px] font-normal text-gray-200 hover:text-white transition-colors duration-200"
           >
             Services
           </Link>
           <Link
-            href="#contact"
+            href="/#contact"
             className="text-[20px] font-normal text-gray-200 hover:text-white transition-colors duration-200"
           >
             Contact
@@ -218,35 +218,35 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#0A0F1D]/95 backdrop-blur-xl border-b border-white/10 px-4 pt-3 pb-6 space-y-3 font-poppins">
           <Link
-            href="#about"
+            href="/#about"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-[20px] font-normal text-gray-200 hover:text-white hover:bg-white/5"
           >
             About
           </Link>
           <Link
-            href="#memberships"
+            href="/#memberships"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-[20px] font-normal text-gray-200 hover:text-white hover:bg-white/5"
           >
             Membership
           </Link>
           <Link
-            href="#blogs"
+            href="/blogs"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-[20px] font-normal text-gray-200 hover:text-white hover:bg-white/5"
           >
-            Resources
+            Blogs & Insights
           </Link>
           <Link
-            href="#services"
+            href="/#services"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-[20px] font-normal text-gray-200 hover:text-white hover:bg-white/5"
           >
             Services
           </Link>
           <Link
-            href="#contact"
+            href="/#contact"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-md text-[20px] font-normal text-gray-200 hover:text-white hover:bg-white/5"
           >
