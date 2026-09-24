@@ -77,6 +77,7 @@ const UserSchema: Schema<IUser> = new Schema(
     avatar: {
       type: String,
       trim: true,
+      select: false, // Large base64 string — only fetch when explicitly needed
     },
     intent: {
       type: String,

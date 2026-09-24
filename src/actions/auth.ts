@@ -188,7 +188,8 @@ export async function getCurrentUserAction(): Promise<ActionResponse> {
     }
 
     await connectToDatabase();
-    const user = await User.findById(session.userId);
+    // +avatar is needed here since the field is select:false by default
+    const user = await User.findById(session.userId).select("+avatar");
     if (!user) {
       return { success: false, error: "User not found" };
     }
@@ -227,7 +228,8 @@ export async function getCurrentUserAction(): Promise<ActionResponse> {
 }
 
 /**
- * Update user profile
+ * Update user profile — text fields only (name, title, company, etc.)
+ * Avatar is handled separately via updateAvatarAction to keep payloads small.
  */
 export async function updateProfileAction(updatedData: Partial<RegisterInput>): Promise<ActionResponse> {
   try {
@@ -236,31 +238,46 @@ export async function updateProfileAction(updatedData: Partial<RegisterInput>): 
       return { success: false, error: "Not authenticated" };
     }
 
+    // Build the $set object — only include fields that were actually sent
+    const $set: Record<string, any> = {};
+    const textFields = [
+      "firstName", "lastName", "title", "phone",
+      "companyName", "industry", "website",
+      "country", "state", "city",
+      "linkedin", "twitter", "stage", "strengths", "challenges",
+    ] as const;
+
+    for (const field of textFields) {
+      if (updatedData[field] !== undefined) {
+        $set[field] = updatedData[field];
+      }
+    }
+
+    // Only include avatar when it's a new upload (data URI) or explicit clear
+    if (updatedData.avatar !== undefined) {
+      const isNewUpload = (updatedData.avatar as string).startsWith("data:");
+      const isClear = updatedData.avatar === "";
+      if (isNewUpload || isClear) {
+        $set.avatar = updatedData.avatar;
+      }
+    }
+
+    if (Object.keys($set).length === 0) {
+      return { success: true, message: "Nothing to update." };
+    }
+
     await connectToDatabase();
-    const user = await User.findById(session.userId);
+
+    // Single atomic write — no separate findById + save round-trip
+    const user = await User.findByIdAndUpdate(
+      session.userId,
+      { $set },
+      { new: true, runValidators: false, select: "+avatar" }
+    );
+
     if (!user) {
       return { success: false, error: "User not found" };
     }
-
-    // Update allowed fields
-    if (updatedData.firstName !== undefined) user.firstName = updatedData.firstName;
-    if (updatedData.lastName !== undefined) user.lastName = updatedData.lastName;
-    if (updatedData.title !== undefined) user.title = updatedData.title;
-    if (updatedData.phone !== undefined) user.phone = updatedData.phone;
-    if (updatedData.avatar !== undefined) user.avatar = updatedData.avatar;
-    if (updatedData.companyName !== undefined) user.companyName = updatedData.companyName;
-    if (updatedData.industry !== undefined) user.industry = updatedData.industry;
-    if (updatedData.website !== undefined) user.website = updatedData.website;
-    if (updatedData.country !== undefined) user.country = updatedData.country;
-    if (updatedData.state !== undefined) user.state = updatedData.state;
-    if (updatedData.city !== undefined) user.city = updatedData.city;
-    if (updatedData.linkedin !== undefined) user.linkedin = updatedData.linkedin;
-    if (updatedData.twitter !== undefined) user.twitter = updatedData.twitter;
-    if (updatedData.stage !== undefined) user.stage = updatedData.stage;
-    if (updatedData.strengths !== undefined) user.strengths = updatedData.strengths;
-    if (updatedData.challenges !== undefined) user.challenges = updatedData.challenges;
-
-    await user.save();
 
     return {
       success: true,

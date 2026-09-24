@@ -117,32 +117,40 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaving(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    const updated = { ...user, ...formData, avatarUrl: formData.avatar };
+
+    // ── Optimistic update ────────────────────────────────────────────────────
+    // Update UI and store IMMEDIATELY so the user sees the change right away.
+    updateStoreUser(updated);
+    if (onProfileUpdated) onProfileUpdated(updated);
+    setSuccessMessage("Profile updated!");
+    setTimeout(() => setSuccessMessage(null), 3000);
+
+    // ── Background sync ──────────────────────────────────────────────────────
+    // Save to server silently. Revert only if there's an actual failure.
+    setIsSaving(true);
     try {
       const res = await updateProfileAction(formData);
-      if (res.success) {
-        setSuccessMessage("Profile updated successfully!");
-        const updated = { ...user, ...formData, avatarUrl: formData.avatar };
-        // Sync the Zustand store so Navbar / any other consumer reflects instantly
-        updateStoreUser(updated);
-        if (onProfileUpdated) {
-          onProfileUpdated(updated);
-        }
-        setTimeout(() => {
-          setSuccessMessage(null);
-        }, 3000);
-      } else {
+      if (!res.success) {
+        // Revert store to old user data on failure
+        updateStoreUser(user);
+        if (onProfileUpdated) onProfileUpdated(user);
+        setSuccessMessage(null);
         setErrorMessage(res.error || "Failed to update profile.");
       }
     } catch (err: any) {
+      updateStoreUser(user);
+      if (onProfileUpdated) onProfileUpdated(user);
+      setSuccessMessage(null);
       setErrorMessage(err.message || "An unexpected error occurred.");
     } finally {
       setIsSaving(false);
     }
   };
+
 
   const fullName = `${formData.firstName} ${formData.lastName}`.trim() || "User Profile";
   const initials = `${(formData.firstName || "U")[0]}${(formData.lastName || "")[0] || ""}`.toUpperCase();
