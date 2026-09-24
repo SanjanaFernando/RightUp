@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X, Camera, Building2, MapPin, Globe, Phone, Mail, User, Save, CheckCircle2 } from "lucide-react";
 import { updateProfileAction } from "@/actions/auth";
+import { useAuthStore } from "@/store/authStore";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -19,6 +20,9 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated }
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Write directly to global store — Navbar avatar updates instantly
+  const { updateUser: updateStoreUser } = useAuthStore();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -83,17 +87,32 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage("Image size must be less than 5MB");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, avatar: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMessage("Image size must be less than 10MB");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        // Compress: max 256x256, JPEG at 0.75 quality — keeps avatars tiny (~15-30KB)
+        const MAX = 256;
+        const scale = Math.min(MAX / img.width, MAX / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressed = canvas.toDataURL("image/jpeg", 0.75);
+        setFormData((prev) => ({ ...prev, avatar: compressed }));
+      };
+      img.src = ev.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -106,8 +125,11 @@ export default function ProfileModal({ isOpen, onClose, user, onProfileUpdated }
       const res = await updateProfileAction(formData);
       if (res.success) {
         setSuccessMessage("Profile updated successfully!");
+        const updated = { ...user, ...formData, avatarUrl: formData.avatar };
+        // Sync the Zustand store so Navbar / any other consumer reflects instantly
+        updateStoreUser(updated);
         if (onProfileUpdated) {
-          onProfileUpdated({ ...user, ...formData, avatarUrl: formData.avatar });
+          onProfileUpdated(updated);
         }
         setTimeout(() => {
           setSuccessMessage(null);

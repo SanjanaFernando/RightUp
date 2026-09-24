@@ -8,6 +8,28 @@ import SignupModal from "./SignupModal";
 import UserDropdown from "./UserDropdown";
 import ProfileModal from "./ProfileModal";
 import { getCurrentUserAction, logoutUserAction } from "@/actions/auth";
+import { useAuthStore } from "@/store/authStore";
+
+/**
+ * Reads the JWT cookie payload without a network request.
+ * Used only as an optimistic fallback on hard refresh before
+ * the sessionStorage store has hydrated.
+ */
+function getOptimisticUserFromCookie(): { firstName: string; lastName: string } | null {
+  try {
+    const cookie = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("rightup_session="));
+    if (!cookie) return null;
+    const token = cookie.split("=")[1];
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (!payload?.name) return null;
+    const parts = (payload.name as string).split(" ");
+    return { firstName: parts[0] || "", lastName: parts[1] || "" };
+  } catch {
+    return null;
+  }
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,8 +37,11 @@ export default function Navbar() {
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [signupModalOpen, setSignupModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
+
+  // ── Global auth store (Zustand) ──────────────────────────────────────────
+  const { user: currentUser, isLoaded, setUser, updateUser, clearUser, setLoaded } = useAuthStore();
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,18 +64,39 @@ export default function Navbar() {
 
   // Check auth state on mount
   useEffect(() => {
+    // If the Zustand store already has a user (from sessionStorage on client-side
+    // navigation or a previous hard refresh), we can skip the DB call entirely.
+    if (currentUser) {
+      setLoaded(true);
+      return;
+    }
+
+    // Fallback: show initials instantly from the JWT cookie while DB loads.
+    const optimistic = getOptimisticUserFromCookie();
+    if (optimistic) {
+      setUser(optimistic as any);
+    }
+
+    // Fetch the full user profile from DB in the background.
     async function loadUser() {
       try {
         const res = await getCurrentUserAction();
         if (res.success && res.data) {
-          setCurrentUser(res.data);
+          setUser(res.data); // persist to store + sessionStorage
+        } else {
+          clearUser(); // session expired or invalid
         }
       } catch (err) {
         console.error("Failed to fetch user session", err);
+        clearUser();
+      } finally {
+        setLoaded(true);
       }
     }
     loadUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   return (
     <header
@@ -137,11 +183,15 @@ export default function Navbar() {
             <UserDropdown
               user={currentUser}
               onOpenProfile={() => setProfileModalOpen(true)}
-              onSignOut={() => {
-                setCurrentUser(null);
-                window.location.reload();
+              onSignOut={async () => {
+                await logoutUserAction();
+                clearUser();
+                window.location.href = "/";
               }}
             />
+          ) : !isLoaded ? (
+            // Skeleton — prevents flash of Signup button while session is confirmed
+            <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
           ) : (
             <button
               onClick={() => setSignupModalOpen(true)}
@@ -240,8 +290,8 @@ export default function Navbar() {
                     onClick={async () => {
                       setMobileMenuOpen(false);
                       await logoutUserAction();
-                      setCurrentUser(null);
-                      window.location.reload();
+                      clearUser();
+                      window.location.href = "/";
                     }}
                     className="flex-1 py-2 rounded-xl text-xs font-semibold text-white bg-red-600/80 hover:bg-red-600 transition-colors"
                   >
@@ -276,7 +326,7 @@ export default function Navbar() {
           isOpen={profileModalOpen}
           onClose={() => setProfileModalOpen(false)}
           user={currentUser}
-          onProfileUpdated={(updated) => setCurrentUser(updated)}
+          onProfileUpdated={(updated) => updateUser(updated)}
         />
       )}
     </header>
