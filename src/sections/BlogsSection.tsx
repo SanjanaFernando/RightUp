@@ -1,16 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import SectionHeader from "@/components/SectionHeader";
 import { ScrollReveal, staggerContainer, staggerChild } from "@/lib/motion";
-import { BLOG_POSTS } from "@/data/blogs";
+import { BLOG_POSTS, BlogPost } from "@/data/blogs";
+import { getAllBlogsAction } from "@/actions/blogs";
 
 export default function BlogsSection() {
-  const displayPosts = BLOG_POSTS.slice(0, 3);
+  const [posts, setPosts] = useState<BlogPost[]>(BLOG_POSTS.slice(0, 3));
+
+  useEffect(() => {
+    async function loadLatestBlogs() {
+      try {
+        const res = await getAllBlogsAction();
+        if (res.success && res.blogs && res.blogs.length > 0) {
+          setPosts(res.blogs.slice(0, 3) as BlogPost[]);
+        }
+      } catch (err) {
+        // Silently use fallback
+      }
+    }
+    loadLatestBlogs();
+  }, []);
+
+  const displayPosts = posts;
 
   return (
     <section id="blogs" className="relative py-24 overflow-hidden">
@@ -50,6 +67,7 @@ export default function BlogsSection() {
                       src={post.image}
                       alt={post.title}
                       fill
+                      unoptimized={post.image?.startsWith("http") || post.image?.startsWith("data:")}
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />

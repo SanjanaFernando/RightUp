@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,8 +14,9 @@ import {
   TrendingUp,
   ChevronRight,
   Tag,
+  Loader2,
 } from "lucide-react";
-import { BLOG_POSTS, BlogPost } from "@/data/blogs";
+import { getAllBlogsAction, BlogType } from "@/actions/blogs";
 import { staggerContainer, staggerChild, ScrollReveal } from "@/lib/motion";
 
 const CATEGORIES = [
@@ -28,12 +29,34 @@ const CATEGORIES = [
   "Community & Scaling",
 ];
 
-export default function BlogsClient() {
+interface BlogsClientProps {
+  initialBlogs?: BlogType[];
+}
+
+export default function BlogsClient({ initialBlogs = [] }: BlogsClientProps) {
+  const [blogs, setBlogs] = useState<BlogType[]>(initialBlogs);
+  const [loading, setLoading] = useState(initialBlogs.length === 0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  useEffect(() => {
+    let active = true;
+    async function fetchFromDb() {
+      if (initialBlogs.length === 0) setLoading(true);
+      const res = await getAllBlogsAction();
+      if (active && res.success && res.blogs) {
+        setBlogs(res.blogs);
+      }
+      if (active) setLoading(false);
+    }
+    fetchFromDb();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const filteredPosts = useMemo(() => {
-    return BLOG_POSTS.filter((post) => {
+    return blogs.filter((post) => {
       const matchesCategory =
         selectedCategory === "All" || post.category === selectedCategory;
       const matchesSearch =
@@ -42,11 +65,11 @@ export default function BlogsClient() {
         post.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesCategory && matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [blogs, searchQuery, selectedCategory]);
 
   const featuredPost = useMemo(() => {
-    return BLOG_POSTS.find((p) => p.featured) || BLOG_POSTS[0];
-  }, []);
+    return blogs.find((p) => p.featured) || blogs[0];
+  }, [blogs]);
 
   const isDefaultView = selectedCategory === "All" && searchQuery.trim() === "";
 
@@ -109,7 +132,7 @@ export default function BlogsClient() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search articles, topics, growth strategies, or authors..."
+              placeholder="Search articles, topics, growth strategies, or tags..."
               className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-[#0B1323]/90 border border-white/10 text-white placeholder-gray-400 text-sm sm:text-base focus:outline-none focus:border-green-400/80 focus:ring-2 focus:ring-green-400/20 backdrop-blur-xl shadow-xl transition-all"
             />
             {searchQuery && (
@@ -150,13 +173,10 @@ export default function BlogsClient() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
                 {/* Image Section */}
                 <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto min-h-[300px] lg:min-h-[420px] overflow-hidden">
-                  <Image
+                  <img
                     src={featuredPost.image}
                     alt={featuredPost.title}
-                    fill
-                    priority
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0B1323] via-[#0B1323]/40 to-transparent" />
                   <div className="absolute top-5 left-5 flex items-center gap-2">
@@ -238,7 +258,12 @@ export default function BlogsClient() {
         </div>
 
         {/* Posts Grid */}
-        {filteredPosts.length === 0 ? (
+        {loading && blogs.length === 0 ? (
+          <div className="text-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-green-400 mb-3" />
+            <p className="text-sm text-gray-400">Loading articles from database...</p>
+          </div>
+        ) : filteredPosts.length === 0 ? (
           <div className="text-center py-20 rounded-3xl bg-[#0B1323]/50 border border-white/10 p-8">
             <BookOpen className="w-12 h-12 text-gray-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">No articles found</h3>
@@ -266,7 +291,7 @@ export default function BlogsClient() {
             <AnimatePresence>
               {filteredPosts.map((post) => (
                 <motion.article
-                  key={post.slug}
+                  key={post._id || post.slug}
                   layout
                   variants={staggerChild}
                   whileHover={{ y: -8 }}
@@ -276,12 +301,10 @@ export default function BlogsClient() {
                   <Link href={`/blogs/${post.slug}`} className="block">
                     {/* Blog Image */}
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-900">
-                      <Image
+                      <img
                         src={post.image}
                         alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0B1323] via-transparent to-transparent opacity-85" />
 

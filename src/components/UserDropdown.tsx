@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, Settings, CreditCard, HelpCircle, LogOut, ChevronDown } from "lucide-react";
+import { User, Settings, CreditCard, HelpCircle, LogOut, ChevronDown, ShieldCheck } from "lucide-react";
 import { logoutUserAction } from "@/actions/auth";
 
 export interface UserMenuProps {
@@ -11,6 +11,7 @@ export interface UserMenuProps {
     lastName?: string;
     email: string;
     avatarUrl?: string;
+    role?: string;
   };
   onSignOut?: () => void;
   onOpenProfile?: () => void;
@@ -99,6 +100,21 @@ export default function UserDropdown({ user, onSignOut, onOpenProfile }: UserMen
 
           {/* Group 1: Profile & Settings */}
           <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-1.5 mb-2.5 space-y-0.5">
+            {user.role === "admin" && (
+              <Link
+                href="/admin"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-green-400 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-[14px] font-semibold transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <ShieldCheck className="w-4 h-4 text-green-400" />
+                  <span>Admin Portal</span>
+                </div>
+                <span className="text-[10px] uppercase tracking-wider bg-green-500/30 text-green-300 px-2 py-0.5 rounded-full font-bold">
+                  Admin
+                </span>
+              </Link>
+            )}
             <button
               type="button"
               onClick={handleOpenProfile}

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { BLOG_POSTS, getBlogPostBySlug, getRelatedBlogPosts } from "@/data/blogs";
+import { getBlogBySlugAction, getAllBlogsAction } from "@/actions/blogs";
 import BlogDetailClient from "./BlogDetailClient";
 
 interface Props {
@@ -13,13 +13,15 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return BLOG_POSTS.map((post) => ({
+  const res = await getAllBlogsAction({ includeUnpublished: true });
+  return (res.blogs || []).map((post) => ({
     slug: post.slug,
   }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = getBlogPostBySlug(params.slug);
+  const res = await getBlogBySlugAction(params.slug);
+  const post = res.blog;
 
   if (!post) {
     return {
@@ -50,14 +52,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function BlogDetailPage({ params }: Props) {
-  const post = getBlogPostBySlug(params.slug);
+export default async function BlogDetailPage({ params }: Props) {
+  const res = await getBlogBySlugAction(params.slug);
+  const post = res.blog;
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = getRelatedBlogPosts(post.slug, 3);
+  const relatedPosts = res.relatedBlogs || [];
 
   return (
     <main className="min-h-screen bg-[#070B12] text-gray-100 selection:bg-green-500 selection:text-white">

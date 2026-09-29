@@ -21,13 +21,13 @@ import {
   Tag,
   ShieldCheck,
 } from "lucide-react";
-import { BlogPost } from "@/data/blogs";
+import { BlogType } from "@/actions/blogs";
 import { ScrollReveal, staggerContainer, staggerChild } from "@/lib/motion";
 import BlogComments from "@/components/BlogComments";
 
 interface BlogDetailClientProps {
-  post: BlogPost;
-  relatedPosts: BlogPost[];
+  post: BlogType;
+  relatedPosts: BlogType[];
 }
 
 export default function BlogDetailClient({
@@ -215,6 +215,7 @@ export default function BlogDetailClient({
             alt={post.title}
             fill
             priority
+            unoptimized
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 896px"
           />
@@ -371,6 +372,7 @@ export default function BlogDetailClient({
                         src={rPost.image}
                         alt={rPost.title}
                         fill
+                        unoptimized
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
