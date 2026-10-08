@@ -94,7 +94,7 @@ export default function Navbar() {
       }
     }
     loadUser();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -131,7 +131,7 @@ export default function Navbar() {
               type="button"
               className="flex items-center gap-1 text-[20px] font-normal text-gray-200 hover:text-white transition-colors duration-200 py-1"
             >
-              <span>Resources</span>
+              <span>Resou</span>
               <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${resourcesOpen ? "rotate-180" : ""}`} />
             </button>
             {resourcesOpen && (
@@ -315,9 +315,9 @@ export default function Navbar() {
       )}
 
       {/* Signup Modal */}
-      <SignupModal 
-        isOpen={signupModalOpen} 
-        onClose={() => setSignupModalOpen(false)} 
+      <SignupModal
+        isOpen={signupModalOpen}
+        onClose={() => setSignupModalOpen(false)}
       />
 
       {/* Profile Modal */}
